@@ -6,6 +6,13 @@ import mongoose from "mongoose";
 
 const app = express();
 
+//routes
+import userRouter from "./routes/userRoute.js";
+
+///////////////////////////////////////
+
+app.use("/api/user", userRouter);
+
 const port = process.env.PORT || 3000;
 
 const start = async () => {
