@@ -1,14 +1,14 @@
 import UserModel from "../models/UserModel.js";
 import bcrypt from "bcryptjs";
 
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
   const { username, email, password } = req.body;
 
-  try {
-    //hashing
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+  //hashing
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
+  try {
     const newUser = new UserModel({
       username,
       email,
@@ -19,7 +19,7 @@ const signup = async (req, res) => {
       message: "User created successfully",
     });
   } catch (error) {
-    res.status(500).json(error.message);
+    next(error);
   }
 };
 
