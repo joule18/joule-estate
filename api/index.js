@@ -8,10 +8,14 @@ const app = express();
 
 //routes
 import userRouter from "./routes/userRoute.js";
+import authRouter from "./routes/authRoute.js";
 
 ///////////////////////////////////////
 
+app.use(express.json());
+
 app.use("/api/user", userRouter);
+app.use("/api/auth", authRouter);
 
 const port = process.env.PORT || 3000;
 
