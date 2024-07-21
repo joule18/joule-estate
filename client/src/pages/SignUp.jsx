@@ -29,6 +29,7 @@ function SignUp() {
       const data = res.data;
       console.log(data);
       setError(null);
+      setLoading(false);
       navigate("/log-in");
     } catch (error) {
       if (error.response.data.success === false) {
@@ -36,8 +37,6 @@ function SignUp() {
         setLoading(false);
         return;
       }
-    } finally {
-      setLoading(false);
     }
   };
 
