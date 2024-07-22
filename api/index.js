@@ -19,15 +19,8 @@ app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  let message = err.message || "Internal server error";
-  if (message.includes("User validation failed: ")) {
-    const cleanMessage = message.split(",");
-    message = cleanMessage.map((el) => {
-      const elParts = el.split(":");
-      const max = elParts.length - 1;
-      return elParts[max];
-    });
-  }
+  const message = err.message || "Internal server error";
+
   return res.status(statusCode).json({
     success: false,
     statusCode,

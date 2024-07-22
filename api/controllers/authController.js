@@ -53,13 +53,13 @@ const login = async (req, res, next) => {
 
     const validUser = await UserModel.findOne({ email });
     if (!validUser) {
-      next(errorHandler(404, "Incorrect Credentials. (email haha)"));
+      next(errorHandler(404, "Incorrect Credentials."));
       return;
     }
 
     //password matching
 
-    const validPassword = bcrypt.compare(password, validUser.password);
+    const validPassword = await bcrypt.compare(password, validUser.password);
     if (!validPassword) {
       next(errorHandler(401, "Incorrect Credentials."));
       return;
