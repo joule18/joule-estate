@@ -91,4 +91,58 @@ const login = async (req, res, next) => {
   }
 };
 
-export { signup, login };
+const google = async (req, res, next) => {
+  const { name, email, photo } = req.body;
+  try {
+    const user = await UserModel.findOne({
+      email,
+    });
+    if (user) {
+      //if user exists, login the user
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      const { password: pass, ...data } = user._doc;
+      res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(data);
+    } else {
+      //if not, register the user
+      //need to generate random password because google doesnt pass password
+      //userModel password is required
+      //user can change their password eventually (?)
+      const generatedPassword =
+        Math.random().toString(36).slice(-8) +
+        Math.random().toString(36).slice(-8); //generates 16 digit password
+
+      //hashing
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(generatedPassword, salt);
+
+      //reconstruct username from google display name
+      const username =
+        name.split(" ").join("").toLowerCase() +
+        Math.random().toString(36).slice(-4);
+
+      const newUser = new UserModel({
+        username,
+        email,
+        password: hashedPassword,
+        avatar: photo,
+      });
+
+      newUser.save();
+
+      //create jwt for user
+      const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
+      const { password, ...data } = newUser._doc;
+      res
+        .cookie("access_token", token, { httpOnly: true })
+        .status(200)
+        .json(data);
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { signup, login, google };

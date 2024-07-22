@@ -7,6 +7,7 @@ import {
   logInStart,
   logInSuccess,
 } from "../redux/user/userSlice";
+import OAuth from "../components/OAuth";
 
 function Login() {
   const navigate = useNavigate();
@@ -68,6 +69,7 @@ function Login() {
         >
           {loading ? "Loading..." : "Login"}
         </button>
+        <OAuth />
       </form>
       <div className="flex gap-2 mt-5">
         <p>Don't have an account?</p>
