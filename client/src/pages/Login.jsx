@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  logInFailure,
+  logInStart,
+  logInSuccess,
+} from "../redux/user/userSlice";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const { loading, error } = useSelector((state) => state.user);
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -19,7 +25,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    dispatch(logInStart());
     try {
       const res = await axios.post("api/auth/login", formData, {
         headers: {
@@ -27,14 +33,12 @@ function Login() {
         },
       });
       const data = res.data;
-      console.log(data);
-      setError(null);
-      setLoading(false);
+      // console.log(data);
+      dispatch(logInSuccess(data));
       navigate("/");
     } catch (error) {
       if (error.response.data.success === false) {
-        setError(error.response.data.message);
-        setLoading(false);
+        dispatch(logInFailure(error.response.data.message));
         return;
       }
     }
