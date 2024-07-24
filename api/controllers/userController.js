@@ -36,7 +36,7 @@ const updateUser = async (req, res, next) => {
       },
       { new: true }
     );
-
+    // used "set" method so maupdate lang yung mga need maupdate. di mawala ang iba
     const { password, ...userData } = updatedUser._doc;
     res.status(200).json(userData);
   } catch (error) {
