@@ -2,6 +2,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { scroller, Element } from "react-scroll";
 
 import {
   getDownloadURL,
@@ -132,8 +133,32 @@ function Profile() {
       const res = await axios.get(`/api/user/listings/${currentUser._id}`);
       const data = res.data;
       setUserListings(data);
+
+      scrollToSection("userListingSection");
     } catch (error) {
       setShowListingsError(true);
+    }
+  };
+
+  const scrollToSection = (section) => {
+    scroller.scrollTo(section, {
+      duration: 500,
+      delay: 0,
+      smooth: "easeInOutQuart",
+    });
+  };
+
+  const handleListingDelete = async (id) => {
+    try {
+      const res = await axios.delete(`/api/listing/delete/${id}`);
+      const data = res.data;
+      setUserListings((prevListing) =>
+        prevListing.filter((listing) => listing._id !== id)
+      );
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "An unexpected error occurred";
+      console.error("Delete operation failed:", errorMessage);
     }
   };
 
@@ -227,39 +252,48 @@ function Profile() {
       {showListingsError && (
         <p className="text-red-700 mt-5">Error showing listings</p>
       )}
-      {userListings && userListings.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-2xl font-semibold">
-            Your listings
-          </h1>
-          {userListings.map((listing) => {
-            return (
-              <div
-                key={listing._id}
-                className="border rounded-lg p-3 flex justify-between items-center gap-4"
-              >
-                <Link to={`/listing/${listing._id}`}>
-                  <img
-                    src={listing.imageUrls[0]}
-                    alt="listing cover"
-                    className="h-16 w-16 object-contain"
-                  />
-                </Link>
-                <Link
-                  className="flex-1 font-semibold text-slate-700 hover:underline truncate"
-                  to={`/listing/${listing._id}`}
+      <Element name="userListingSection">
+        {userListings && userListings.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <h1 className="text-center mt-7 text-2xl font-semibold">
+              Your listings
+            </h1>
+            {userListings.map((listing) => {
+              return (
+                <div
+                  key={listing._id}
+                  className="border rounded-lg p-3 flex justify-between items-center gap-4"
                 >
-                  <p>{listing.name}</p>
-                </Link>
-                <div className="flex flex-col items-center">
-                  <button className="text-red-700 uppercase">Delete</button>
-                  <button className="text-green-700 uppercase">Edit</button>
+                  <Link to={`/listing/${listing._id}`}>
+                    <img
+                      src={listing.imageUrls[0]}
+                      alt="listing cover"
+                      className="h-16 w-16 object-contain"
+                    />
+                  </Link>
+                  <Link
+                    className="flex-1 font-semibold text-slate-700 hover:underline truncate"
+                    to={`/listing/${listing._id}`}
+                  >
+                    <p>{listing.name}</p>
+                  </Link>
+                  <div className="flex flex-col items-center gap-4">
+                    <button
+                      onClick={() => handleListingDelete(listing._id)}
+                      className="text-red-700 uppercase hover:underline"
+                    >
+                      Delete
+                    </button>
+                    <button className="text-green-700 uppercase hover:underline">
+                      Edit
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </Element>
     </div>
   );
 }
