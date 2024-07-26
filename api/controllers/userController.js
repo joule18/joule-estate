@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 
 import errorHandler from "../utils/error.js";
 import UserModel from "../models/UserModel.js";
+import ListingModel from "../models/ListingModel.js";
 
 const updateUser = async (req, res, next) => {
   if (req.user.id !== req.params.id) {
@@ -50,4 +51,17 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-export { updateUser, deleteUser };
+const getUserListing = async (req, res, next) => {
+  if (req.user.id === req.params.id) {
+    try {
+      const listings = await ListingModel.find({ userRef: req.params.id });
+      res.status(200).json(listings);
+    } catch (error) {
+      next(error);
+    }
+  } else {
+    next(errorHandler(401, "You can only view your own listings."));
+  }
+};
+
+export { updateUser, deleteUser, getUserListing };
