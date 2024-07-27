@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { app } from "../firebase";
 import {
@@ -11,9 +11,10 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 
-function CreateListing() {
+function UpdateListing() {
   const { currentUser } = useSelector((state) => state.user);
   const navigate = useNavigate();
+  const params = useParams();
 
   const [files, setFiles] = useState([]);
   const [formData, setFormData] = useState({
@@ -36,7 +37,21 @@ function CreateListing() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  console.log(formData);
+  useEffect(() => {
+    const fetchListing = async () => {
+      const listingId = params.listingId;
+      try {
+        const res = await axios.get(`/api/listing/get/${listingId}`);
+        const data = res.data;
+        setFormData(data);
+      } catch (error) {
+        const errorMessage = error?.response?.data?.message || error.message;
+        console.error("Error message:", errorMessage);
+      }
+    };
+    fetchListing();
+  }, []);
+
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
       setUploading(true);
@@ -142,7 +157,7 @@ function CreateListing() {
       setError(false);
 
       const res = await axios.post(
-        "/api/listing/create",
+        `/api/listing/update/${params.listingId}`,
         { ...formData, userRef: currentUser._id },
         {
           headers: {
@@ -166,7 +181,7 @@ function CreateListing() {
   return (
     <main className="p-3 max-w-4xl mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">
-        Create a Listing
+        Update a Listing
       </h1>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-4">
         <div className="flex flex-col gap-4 flex-1">
@@ -384,7 +399,7 @@ function CreateListing() {
               ? "Creating..."
               : imageUploadError
               ? "Please wait..."
-              : "Create Listing"}
+              : "Update Listing"}
           </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
         </div>
@@ -392,4 +407,4 @@ function CreateListing() {
     </main>
   );
 }
-export default CreateListing;
+export default UpdateListing;
