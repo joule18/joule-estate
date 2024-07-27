@@ -167,7 +167,7 @@ function UpdateListing() {
       );
       const data = res.data;
       setLoading(false);
-      navigate(`/lising/${data._id}`);
+      navigate(`/listing/${data._id}`);
     } catch (error) {
       if (error.response && error.response.data) {
         setError(error.response.data.message);
