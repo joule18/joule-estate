@@ -346,7 +346,7 @@ function UpdateListing() {
             Images:
             <span className="font-normal text-gray-600 ml-2">
               The first image will be the cover (max 6). Please upload the
-              image/s first before creating the listing.
+              image/s first before updating the listing.
             </span>
           </p>
           <div className="flex gap-4">
@@ -396,7 +396,7 @@ function UpdateListing() {
             className="p-3 bg-slate-700 text-white rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
           >
             {loading
-              ? "Creating..."
+              ? "Updating..."
               : imageUploadError
               ? "Please wait..."
               : "Update Listing"}
